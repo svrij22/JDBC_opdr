@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_create_student.sql" dialect="PostgreSQL" />
+    <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_customers_student.sql" dialect="PostgreSQL" />
+    <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_orderlines_student.sql" dialect="PostgreSQL" />
+    <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_orders_student.sql" dialect="PostgreSQL" />
+    <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_stockitems_student.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/src/Main.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/dao/reizigerDAOSql.java" dialect="GenericSQL" />
+  </component>
+</project>
