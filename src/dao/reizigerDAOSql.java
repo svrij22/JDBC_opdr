@@ -20,6 +20,7 @@ public class reizigerDAOSql implements reizigerDAO{
 
     @Override
     public boolean save(Reiziger reiziger) throws Exception {
+
         //Already exists
         if (this.idExists(reiziger.getReiziger_id())){
             throw new Exception("Reiziger met deze ID bestaat al.");
@@ -29,16 +30,15 @@ public class reizigerDAOSql implements reizigerDAO{
         reizigers.add(reiziger);
 
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("insert into reiziger values (%s, '%s', '%s', '%s', '%s')",
-                reiziger.getReiziger_id(),
-                reiziger.getVoorletters(),
-                reiziger.getTussenvoegsel(),
-                reiziger.getAchternaam(),
-                reiziger.getDate().toString());
+        PreparedStatement stmt = connection.prepareStatement("insert into reiziger values (?, ?, ?, ?, ?)"); // Create statement
+        stmt.setInt(1, reiziger.getReiziger_id());
+        stmt.setString(2, reiziger.getVoorletters());
+        stmt.setString(3, reiziger.getTussenvoegsel());
+        stmt.setString(4, reiziger.getAchternaam());
+        stmt.setDate(5, reiziger.getDate());
 
         //Return result
-        return stmt.execute(sql);
+        return stmt.execute();
     }
 
     @Override
@@ -49,19 +49,17 @@ public class reizigerDAOSql implements reizigerDAO{
         reizigers.add(reiziger);
 
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("UPDATE reiziger SET " +
-                        "voorletters='%s', " +
-                        "tussenvoegsel='%s', " +
-                        "achternaam='%s', " +
-                        "geboortedatum='%s' " +
-                        "WHERE reiziger_id='%s'",
-                reiziger.getVoorletters(),
-                reiziger.getTussenvoegsel(),
-                reiziger.getAchternaam(),
-                reiziger.getDate().toString(),
-                reiziger.getReiziger_id());
-        return stmt.execute(sql);
+        PreparedStatement stmt = connection.prepareStatement("UPDATE reiziger SET voorletters=?, tussenvoegsel=?, " +
+                        "achternaam=?, geboortedatum=? WHERE reiziger_id=?");
+
+        stmt.setString(1, reiziger.getVoorletters());
+        stmt.setString(2, reiziger.getTussenvoegsel());
+        stmt.setString(3, reiziger.getAchternaam());
+        stmt.setDate(4, reiziger.getDate());
+        stmt.setInt(5, reiziger.getReiziger_id());
+
+        //Execute and return value
+        return stmt.execute();
     }
 
     @Override
@@ -70,9 +68,9 @@ public class reizigerDAOSql implements reizigerDAO{
         reizigers.remove(reiziger);
 
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("DELETE FROM reiziger WHERE reiziger_id='%s'", reiziger.getReiziger_id());
-        return stmt.execute(sql);
+        PreparedStatement stmt = connection.prepareStatement("DELETE FROM reiziger WHERE reiziger_id=?");
+        stmt.setInt(1, reiziger.getReiziger_id());
+        return stmt.execute();
     }
 
     public boolean idExists(int id) throws SQLException {
@@ -84,9 +82,8 @@ public class reizigerDAOSql implements reizigerDAO{
         boolean exists = false;
         try {
             exists = (rs.getInt("reiziger_id") == id);
-        } finally {
-            return exists;
-        }
+        }catch (Exception ignored){}
+        return exists;
     }
 
     @Override

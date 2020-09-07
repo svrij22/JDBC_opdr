@@ -88,13 +88,12 @@ public class adresDAOSql implements AdresDAO{
         boolean exists = false;
         try {
             exists = (rs.getInt("adres_id") == id);
-        } finally {
-            return exists;
-        }
+        }catch (Exception ignored){}
+        return exists;
     }
 
     public Adres findById(int id) throws SQLException {
-        for (Adres a : this.findAll()) {
+        for (Adres a : findAll()) {
             if (a.getAdres_id() == id) return a;
         }
         return null;

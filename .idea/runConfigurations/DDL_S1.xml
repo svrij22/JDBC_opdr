@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DDL S1" type="DatabaseScript" editBeforeRun="true">
+    <script-file value="$APPLICATION_CONFIG_DIR$/consoles/db/80ec4c33-344e-4dd7-8598-6acbd7c96a66/console.sql" />
+    <script-mode>FILE</script-mode>
+    <method v="2" />
+  </configuration>
+</component>
