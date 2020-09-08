@@ -12,11 +12,7 @@ public interface AdresDAO {
     public boolean update(Adres adres) throws SQLException;
     public boolean delete(Adres adres) throws SQLException;
 
-    public static List<Adres> findByReiziger(Reiziger reiziger) throws SQLException {
-        return null;
-    }
-
-    public static ArrayList<Adres> findAll() throws SQLException {
-        return null;
-    }
+    Adres findById(int id, boolean link) throws SQLException;
+    List<Adres> findByReiziger(Reiziger reiziger, boolean link) throws SQLException;
+    ArrayList<Adres> findAll(boolean link) throws SQLException;
 }

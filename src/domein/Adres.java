@@ -3,6 +3,7 @@ package domein;
 public class Adres {
     private int adres_id, reiziger_id;
     private String postcode, huisnummer, straat, woonplaats;
+    private Reiziger reiziger;
 
     public Adres(int adres_id, int reiziger_id, String postcode, String huisnummer, String straat, String woonplaats) {
         this.adres_id = adres_id;
@@ -11,6 +12,14 @@ public class Adres {
         this.huisnummer = huisnummer;
         this.straat = straat;
         this.woonplaats = woonplaats;
+    }
+
+    public Reiziger getReiziger() {
+        return reiziger;
+    }
+
+    public void setReiziger(Reiziger reiziger) {
+        this.reiziger = reiziger;
     }
 
     public int getAdres_id() {

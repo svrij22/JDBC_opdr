@@ -109,7 +109,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
             );
 
             //Set reiziger
-            Reiziger reiziger = ReizigerDAOPsql.thisDAOS.findById(chipkaart.getReiziger_id());
+            Reiziger reiziger = ReizigerDAOPsql.DAO.findById(chipkaart.getReiziger_id(), true);
             reiziger.addKaart(chipkaart);
             chipkaart.setReiziger(reiziger);
 

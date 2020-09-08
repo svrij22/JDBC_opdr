@@ -10,11 +10,12 @@ import java.util.List;
 import static java.lang.Integer.parseInt;
 
 public class AdresDAOPsql implements AdresDAO{
-    static Connection connection;
-    static ArrayList<Adres> adressen = new ArrayList<Adres>();
+    Connection connection;
+    static AdresDAOPsql DAO;
 
     public AdresDAOPsql(Connection connection) {
-        AdresDAOPsql.connection = connection;
+        this.connection = connection;
+        DAO = this;
     }
 
     @Override
@@ -25,108 +26,103 @@ public class AdresDAOPsql implements AdresDAO{
             throw new Exception("Adres met deze ID bestaat al.");
         }
 
-        //Voeg toe aan lijst
-        adressen.add(adres);
-
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("insert into adres values (%s, '%s', '%s', '%s', '%s', %s)",
-                adres.getAdres_id(),
-                adres.getPostcode(),
-                adres.getHuisnummer(),
-                adres.getStraat(),
-                adres.getWoonplaats(),
-                adres.getReiziger_id());
+        PreparedStatement stmt = connection.prepareStatement("insert into adres values (?, ?, ?, ?, ?, ?)"); // Create statement
+        stmt.setInt(1, adres.getAdres_id());
+        stmt.setString(2, adres.getPostcode());
+        stmt.setString(3, adres.getHuisnummer());
+        stmt.setString(4, adres.getStraat());
+        stmt.setString(5, adres.getWoonplaats());
+        stmt.setInt(6, adres.getReiziger_id());
 
         //Return result
-        return stmt.execute(sql);
+        return stmt.execute();
     }
 
     @Override
     public boolean update(Adres adres) throws SQLException {
-
-        //Update by replacing
-        Adres orig = this.findById(adres.getAdres_id());
-        adressen.remove(orig);
-        adressen.add(adres);
-
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("UPDATE adres SET " +
-                        "postcode='%s', " +
-                        "huisnummer='%s', " +
-                        "straat='%s', " +
-                        "woonplaats='%s' " +
-                        "reiziger_id=%s, " +
-                        "WHERE adres_id='%s'",
-                adres.getPostcode(),
-                adres.getHuisnummer(),
-                adres.getStraat(),
-                adres.getWoonplaats(),
-                adres.getReiziger_id(),
-                adres.getAdres_id());
-        return stmt.execute(sql);
+        PreparedStatement stmt = connection.prepareStatement("UPDATE adres SET postcode=?, huisnummer=?, " +
+                "straat=?, woonplaats=?, reiziger_id=? WHERE adres_id=?");
+
+        stmt.setString(1, adres.getPostcode());
+        stmt.setString(2, adres.getHuisnummer());
+        stmt.setString(3, adres.getStraat());
+        stmt.setString(4, adres.getWoonplaats());
+        stmt.setInt(5, adres.getReiziger_id());
+        stmt.setInt(6, adres.getAdres_id());
+
+        //Execute and return value
+        return stmt.execute();
     }
 
     @Override
     public boolean delete(Adres adres) throws SQLException {
-        //Remove from list
-        adressen.remove(adres);
-
         //Create statement
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("DELETE FROM adres WHERE adres_id='%s'", adres.getAdres_id());
-        return stmt.execute(sql);
+        PreparedStatement stmt = connection.prepareStatement("DELETE FROM adres WHERE adres_id=?");
+        stmt.setInt(1, adres.getAdres_id());
+        return stmt.execute();
     }
 
     public boolean idExists(int id) throws SQLException {
-        Statement stmt = connection.createStatement(); // Create statement
-        String sql = String.format("SELECT * FROM adres WHERE adres_id=%s", id);
-        ResultSet rs = stmt.executeQuery(sql); // Get results
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM adres WHERE adres_id=?"); // Create statement
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery(); // Get results
 
         rs.next();
-        boolean exists = false;
         try {
-            exists = (rs.getInt("adres_id") == id);
+            return (rs.getInt("adres_id") == id);
         }catch (Exception ignored){}
-        return exists;
+        return false;
     }
 
-    public Adres findById(int id) throws SQLException {
-        for (Adres a : findAll(false)) {
-            if (a.getAdres_id() == id) return a;
-        }
-        return null;
+    @Override
+    public Adres findById(int id, boolean link) throws SQLException {
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM adres WHERE adres_id=?");
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery(); // Get results
+        return adresRsToList(rs, link).get(0);
     }
 
-    public static List<Adres> findByReiziger(Reiziger reiziger) throws SQLException {
-        ArrayList<Adres> gevondenAdressen = new ArrayList<>();
-        for (Adres a : findAll(true)) {
-            if (a.getReiziger_id() == reiziger.getReiziger_id()) gevondenAdressen.add(a);
-        }
-        return gevondenAdressen;
+    @Override
+    public List<Adres> findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
+        int reiziger_id = reiziger.getReiziger_id();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM adres WHERE reiziger_id=?");
+        stmt.setInt(1, reiziger_id);
+        ResultSet rs = stmt.executeQuery(); // Get results
+        return adresRsToList(rs, link);
     }
 
-    public static ArrayList<Adres> findAll(boolean singleRecurse) throws SQLException {
-        adressen.clear(); // Clear original list
-        Statement stmt = connection.createStatement(); // Create statement
+    @Override
+    public ArrayList<Adres> findAll(boolean link) throws SQLException {
+        Statement stmt = AdresDAOPsql.DAO.connection.createStatement(); // Create statement
         String sql = "SELECT * FROM adres";
         ResultSet rs = stmt.executeQuery(sql); // Get results
+        return adresRsToList(rs, link);
+    }
+
+    public ArrayList<Adres> adresRsToList(ResultSet rs, boolean link) throws SQLException {
+        ArrayList<Adres> adressen = new ArrayList<>();
 
         while (rs.next()){
-
-            //Get alle key and value pairs from database
-            String[] keys = new String[]{"adres_id", "postcode", "huisnummer", "straat", "woonplaats", "reiziger_id"};
-            ArrayList<String> vals = new ArrayList<>();
-            for (String key : keys) vals.add(rs.getString(key));
-
             //Link the values to a new object
-            Adres adres = new Adres(parseInt(vals.get(0)), parseInt(vals.get(5)), vals.get(1), vals.get(2), vals.get(3), vals.get(4));
+            Adres adres = new Adres(
+                    rs.getInt("adres_id"),
+                    rs.getInt("reiziger_id"),
+                    rs.getString("postcode"),
+                    rs.getString("huisnummer"),
+                    rs.getString("straat"),
+                    rs.getString("woonplaats")
+            );
 
-            //Find by id
-            if (!singleRecurse){
-                ReizigerDAOPsql.thisDAOS.findById(adres.getReiziger_id()).setAdres(adres);
+            //Links the reiziger and adres
+            if (link){
+                Reiziger reiz = ReizigerDAOPsql.DAO.findById(adres.getReiziger_id(), false);
+                reiz.setAdres(adres);
+                adres.setReiziger(reiz);
             }
+
+            //Add to list
             adressen.add(adres);
         }
 

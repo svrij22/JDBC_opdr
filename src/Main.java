@@ -74,6 +74,9 @@ class Main {
                 System.out.println(ovc);
             }
 
+            //New test
+            System.out.println("gevonden reiziger " + DAOS.findByGb("1800-03-02", true));
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -90,7 +93,7 @@ class Main {
         //Create properties object
         Properties props = new Properties();
         props.setProperty("user","ov");
-        props.setProperty("password","cybernet22");
+        props.setProperty("password","ov");
         conn = DriverManager.getConnection(url, props);
     }
 
@@ -112,7 +115,7 @@ class Main {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
-        List<Reiziger> reizigers = rdao.findAll(false);
+        List<Reiziger> reizigers = rdao.findAll(true);
         System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
         for (Reiziger r : reizigers) {
             System.out.println(r);
@@ -132,7 +135,7 @@ class Main {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
-        List<Adres> adressen = AdresDAOPsql.findAll(true);
+        List<Adres> adressen = adao.findAll(true);
         System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
         for (Adres a : adressen) {
             System.out.println(a);

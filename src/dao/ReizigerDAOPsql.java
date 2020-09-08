@@ -11,12 +11,11 @@ import static java.lang.Integer.parseInt;
 
 public class ReizigerDAOPsql implements ReizigerDAO {
     Connection connection;
-    ArrayList<Reiziger> reizigers = new ArrayList<>();
-    static ReizigerDAOPsql thisDAOS;
+    static ReizigerDAOPsql DAO;
 
     public ReizigerDAOPsql(Connection connection) {
         this.connection = connection;
-        thisDAOS = this;
+        DAO = this;
     }
 
     @Override
@@ -26,9 +25,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         if (this.idExists(reiziger.getReiziger_id())){
             throw new Exception("Reiziger met deze ID bestaat al.");
         }
-
-        //Voeg toe aan lijst
-        reizigers.add(reiziger);
 
         //Create statement
         PreparedStatement stmt = connection.prepareStatement("insert into reiziger values (?, ?, ?, ?, ?)"); // Create statement
@@ -44,14 +40,8 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public boolean update(Reiziger reiziger) throws SQLException {
-        //Update by replacing
-        Reiziger orig = this.findById(reiziger.getReiziger_id());
-        reizigers.remove(orig);
-        reizigers.add(reiziger);
-
         //Create statement
-        PreparedStatement stmt = connection.prepareStatement("UPDATE reiziger SET voorletters=?, tussenvoegsel=?, " +
-                        "achternaam=?, geboortedatum=? WHERE reiziger_id=?");
+        PreparedStatement stmt = connection.prepareStatement("UPDATE reiziger SET voorletters=?, tussenvoegsel=?, achternaam=?, geboortedatum=? WHERE reiziger_id=?");
 
         stmt.setString(1, reiziger.getVoorletters());
         stmt.setString(2, reiziger.getTussenvoegsel());
@@ -65,9 +55,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
     @Override
     public boolean delete(Reiziger reiziger) throws SQLException {
-        //Remove from list
-        reizigers.remove(reiziger);
-
         //Create statement
         PreparedStatement stmt = connection.prepareStatement("DELETE FROM reiziger WHERE reiziger_id=?");
         stmt.setInt(1, reiziger.getReiziger_id());
@@ -80,54 +67,56 @@ public class ReizigerDAOPsql implements ReizigerDAO {
         ResultSet rs = stmt.executeQuery(); // Get results
 
         rs.next();
-        boolean exists = false;
         try {
-            exists = (rs.getInt("reiziger_id") == id);
+            return (rs.getInt("reiziger_id") == id);
         }catch (Exception ignored){}
-        return exists;
+        return false;
     }
 
     @Override
-    public Reiziger findById(int id) throws SQLException {
-        for (Reiziger r : this.findAll(false)) {
-            if (r.getReiziger_id() == id) return r;
-        }
-        return null;
+    public Reiziger findById(int id, boolean link) throws SQLException {
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM reiziger WHERE reiziger_id=?");
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery(); // Get results
+        return reizigerRsToList(rs, link).get(0);
     }
 
     @Override
-    public List<Reiziger> findByGb(String datum) throws SQLException {
-        ArrayList<Reiziger> gevondenReizigers = new ArrayList<>();
-        for (Reiziger r : this.findAll(false)) {
-            if (r.getDate().toString().equals(datum)) gevondenReizigers.add(r);
-        }
-        return gevondenReizigers;
+    public List<Reiziger> findByGb(String datum, boolean link) throws SQLException {
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM reiziger WHERE geboortedatum=?");
+        stmt.setDate(1,Date.valueOf(datum));
+        ResultSet rs = stmt.executeQuery(); // Get results
+        return reizigerRsToList(rs, link);
     }
 
     @Override
-    public List<Reiziger> findAll(boolean singleRecurse) throws SQLException {
-        reizigers.clear(); // Clear original list
+    public List<Reiziger> findAll(boolean link) throws SQLException {
         Statement stmt = connection.createStatement(); // Create statement
         String sql = "SELECT * FROM reiziger";
         ResultSet rs = stmt.executeQuery(sql); // Get results
+        return reizigerRsToList(rs, link);
+    }
+
+    public List<Reiziger> reizigerRsToList(ResultSet rs, boolean link) throws SQLException {
+        ArrayList<Reiziger> reizigers = new ArrayList<>();
 
         while (rs.next()){
 
-            //Get alle key and value pairs from database
-            String[] keys = new String[]{"reiziger_id", "voorletters", "tussenvoegsel", "achternaam", "geboortedatum"};
-            ArrayList<String> vals = new ArrayList<>();
-            for (String key : keys) vals.add(rs.getString(key));
-
             //Link the values to a new object
-            Reiziger reiz = new Reiziger(parseInt(vals.get(0)),
-                    vals.get(1), vals.get(2), vals.get(3),
-                    Date.valueOf(vals.get(4))
+            Reiziger reiz = new Reiziger(
+                    rs.getInt("reiziger_id"),
+                    rs.getString("voorletters"),
+                    rs.getString("tussenvoegsel"),
+                    rs.getString("achternaam"),
+                    rs.getDate("geboortedatum")
             );
 
-            //Sets the reiziger adress
-            if (!singleRecurse){
-                List<Adres> adres = AdresDAOPsql.findByReiziger(reiz);
-                reiz.setAdres((adres.size() > 0) ? adres.get(0) : null);
+            //Links the reiziger and adres
+            if (link){
+                List<Adres> adres = AdresDAOPsql.DAO.findByReiziger(reiz, false);
+                Adres adres1 = (adres.size() > 0) ? adres.get(0) : null;
+                if (adres1 != null) adres1.setReiziger(reiz);
+                reiz.setAdres(adres1);
             }
 
             //Add to list
