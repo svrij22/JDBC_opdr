@@ -1,5 +1,6 @@
 package dao;
 
+import domein.Adres;
 import domein.OVChipKaart;
 import domein.Reiziger;
 
@@ -41,18 +42,16 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         ResultSet rs = stmt.executeQuery(); // Get results
 
         rs.next();
-        boolean exists = false;
         try {
-            exists = (rs.getInt("kaart_nummer") == kaartnummer);
+            return (rs.getInt("kaart_nummer") == kaartnummer);
         }catch (Exception ignored){}
-        return exists;
+        return false;
     }
 
     @Override
     public boolean update(OVChipKaart ovchip) throws SQLException {
         //Create statement
-        PreparedStatement stmt = connection.prepareStatement("UPDATE ov_chipkaart SET reiziger_id=?, geldig_tot=?, " +
-                "klasse=?, saldo=? WHERE kaart_nummer=?");
+        PreparedStatement stmt = connection.prepareStatement("UPDATE ov_chipkaart SET reiziger_id=?, geldig_tot=?, klasse=?, saldo=? WHERE kaart_nummer=?");
 
         stmt.setInt(1, ovchip.getReiziger_id());
         stmt.setDate(2, (Date) ovchip.getGeldig_tot());
@@ -79,39 +78,49 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     @Override
     public List<OVChipKaart> findByReiziger(Reiziger reiziger) throws SQLException {
         ArrayList<OVChipKaart> ovkaarten = new ArrayList<>();
-        for (OVChipKaart ov : this.findAll()) {
+        for (OVChipKaart ov : this.findAll(false)) {
             if (reiziger.getReiziger_id() == ov.getReiziger_id()) ovkaarten.add(ov);
         }
         return ovkaarten;
     }
 
     @Override
-    public List<OVChipKaart> findAll() throws SQLException {
-        ArrayList<OVChipKaart> ovChipKaarten = new ArrayList<>();
+    public List<OVChipKaart> findAll(boolean link) throws SQLException {
         Statement stmt = connection.createStatement(); // Create statement
-        ResultSet rs = stmt.executeQuery("SELECT * FROM ov_chipkaart"); // Get results
+        String sql = "SELECT * FROM ov_chipkaart";
+        ResultSet rs = stmt.executeQuery(sql); // Get results
+        return ovRsToList(rs, link);
+    }
+
+    public List<OVChipKaart> ovRsToList(ResultSet rs, boolean link) throws SQLException {
+        ArrayList<OVChipKaart> ovChipKaarten = new ArrayList<>();
 
         while (rs.next()){
-
-            //Get alle key and value pairs from database
-            String[] keys = new String[]{"kaart_nummer", "geldig_tot", "klasse", "saldo", "reiziger_id"};
-
-            ArrayList<String> vals = new ArrayList<>();
-            for (String key : keys) vals.add(rs.getString(key));
-
             //Link the values to a new object
             OVChipKaart chipkaart = new OVChipKaart(
-                    parseInt(vals.get(0)),
-                    parseInt(vals.get(2)),
-                    parseInt(vals.get(4)),
-                    Date.valueOf(vals.get(1)),
-                    Double.parseDouble(vals.get(3))
+                    rs.getInt("kaart_nummer"),
+                    rs.getInt("klasse"),
+                    rs.getInt("reiziger_id"),
+                    rs.getDate("geldig_tot"),
+                    rs.getDouble("saldo")
             );
 
-            //Set reiziger
-            Reiziger reiziger = ReizigerDAOPsql.DAO.findById(chipkaart.getReiziger_id(), true);
-            reiziger.addKaart(chipkaart);
-            chipkaart.setReiziger(reiziger);
+            //Links the reiziger, adres and OV
+            if (link){
+
+                //Find reiziger
+                Reiziger reiziger = ReizigerDAOPsql.DAO.findById(chipkaart.getReiziger_id(), true);
+
+                //Link kaart both ways
+                reiziger.addKaart(chipkaart);
+                chipkaart.setReiziger(reiziger);
+
+                //Get adress and link both ways
+                List<Adres> adres = AdresDAOPsql.DAO.findByReiziger(reiziger, false);
+                Adres adres1 = (adres.size() > 0) ? adres.get(0) : null;
+                if (adres1 != null) adres1.setReiziger(reiziger);
+                reiziger.setAdres(adres1);
+            }
 
             //Add to list
             ovChipKaarten.add(chipkaart);

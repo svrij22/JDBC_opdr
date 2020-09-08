@@ -16,9 +16,11 @@ class Main {
             Main.getConnection();
             Main.opdracht1();
 
-            //Create new
+            //Create new DAO's
             ReizigerDAOPsql DAOS = new ReizigerDAOPsql(conn);
-            AdresDAOPsql AAOS = new AdresDAOPsql(conn);
+            AdresDAOPsql ADAOS = new AdresDAOPsql(conn);
+            OVChipkaartDAOPsql OVDAO = new OVChipkaartDAOPsql(conn);
+
             List<Reiziger> alleReizigers = DAOS.findAll(true);
             for (Reiziger r : alleReizigers){
                 System.out.println(r.toString());
@@ -65,17 +67,20 @@ class Main {
             DAOS.delete(sietske); // debug
 
             testReizigerDAO(DAOS);
-            testAdresDAO(AAOS);
+            testAdresDAO(ADAOS);
             DAOS.delete(sietske);
 
             //Test OVChipkaartDAO
             OVChipkaartDAOPsql OVC_DAOSql = new OVChipkaartDAOPsql(conn);
-            for (OVChipKaart ovc : OVC_DAOSql.findAll()){
+            for (OVChipKaart ovc : OVC_DAOSql.findAll(true)){
                 System.out.println(ovc);
             }
 
             //New test
             System.out.println("gevonden reiziger " + DAOS.findByGb("1800-03-02", true));
+
+            //OV TEST
+            testOVDAO(OVDAO);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -141,5 +146,24 @@ class Main {
             System.out.println(a);
         }
         System.out.println();
+    }
+
+    private static void testOVDAO(OVChipkaartDAO ovdao) throws Exception {
+        System.out.println("\n---------- Test ReizigerDAO -------------");
+
+        // Haal alle reizigers op uit de database
+        List<OVChipKaart> kaarten = ovdao.findAll(true);
+        System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende kaarten:");
+        for (OVChipKaart ov : kaarten) {
+            System.out.println(ov);
+        }
+        System.out.println();
+
+        // Maak een nieuwe reiziger aan en persisteer deze in de database
+        OVChipKaart nkaart = new OVChipKaart(177, 1, 1, Date.valueOf("1990-09-10"), 23.90);
+        System.out.print("[Test] Eerst " + kaarten.size() + " kaarten, na OVChipkaartDAO.save() ");
+        ovdao.save(nkaart);
+        kaarten = ovdao.findAll(true);
+        System.out.println(kaarten.size() + " reizigers\n");
     }
 }
