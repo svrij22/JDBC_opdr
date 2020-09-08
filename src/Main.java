@@ -1,8 +1,6 @@
-import dao.AdresDAO;
-import dao.adresDAOSql;
-import dao.reizigerDAO;
-import dao.reizigerDAOSql;
+import dao.*;
 import domein.Adres;
+import domein.OVChipKaart;
 import domein.Reiziger;
 
 import java.sql.*;
@@ -19,9 +17,9 @@ class Main {
             Main.opdracht1();
 
             //Create new
-            reizigerDAOSql DAOS = new reizigerDAOSql(conn);
-            adresDAOSql AAOS = new adresDAOSql(conn);
-            List<Reiziger> alleReizigers = DAOS.findAll();
+            ReizigerDAOPsql DAOS = new ReizigerDAOPsql(conn);
+            AdresDAOPsql AAOS = new AdresDAOPsql(conn);
+            List<Reiziger> alleReizigers = DAOS.findAll(true);
             for (Reiziger r : alleReizigers){
                 System.out.println(r.toString());
             }
@@ -33,7 +31,7 @@ class Main {
             System.out.println(DAOS.idExists(77));
 
             //Print aantal
-            System.out.println("Aantal reizigers " + DAOS.findAll().size());
+            System.out.println("Aantal reizigers " + DAOS.findAll(true).size());
 
             //Maak reiziger aan
             Reiziger reiz1 = new Reiziger(9, "B", "de", "Bouwer", Date.valueOf("1800-03-02"));
@@ -46,7 +44,7 @@ class Main {
                 DAOS.save(reiz2);
 
                 //Print aantal
-                System.out.println("Aantal reizigers (+2) " + DAOS.findAll().size());
+                System.out.println("Aantal reizigers (+2) " + DAOS.findAll(true).size());
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -61,7 +59,7 @@ class Main {
             DAOS.delete(reiz2);
 
             //Print aantal
-            System.out.println("Aantal reizigers " + DAOS.findAll().size());
+            System.out.println("Aantal reizigers " + DAOS.findAll(true).size());
 
             //Overige tests
             DAOS.delete(sietske); // debug
@@ -70,12 +68,19 @@ class Main {
             testAdresDAO(AAOS);
             DAOS.delete(sietske);
 
+            //Test OVChipkaartDAO
+            OVChipkaartDAOPsql OVC_DAOSql = new OVChipkaartDAOPsql(conn);
+            for (OVChipKaart ovc : OVC_DAOSql.findAll()){
+                System.out.println(ovc);
+            }
+
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
     public static void getConnection() throws SQLException {
+
         //Try connecting to database
         System.out.println("Attempting to get connection");
 
@@ -85,7 +90,7 @@ class Main {
         //Create properties object
         Properties props = new Properties();
         props.setProperty("user","ov");
-        props.setProperty("password","ov");
+        props.setProperty("password","cybernet22");
         conn = DriverManager.getConnection(url, props);
     }
 
@@ -103,11 +108,11 @@ class Main {
         }
     }
 
-    private static void testReizigerDAO(reizigerDAO rdao) throws Exception {
+    private static void testReizigerDAO(ReizigerDAO rdao) throws Exception {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
-        List<Reiziger> reizigers = rdao.findAll();
+        List<Reiziger> reizigers = rdao.findAll(false);
         System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
         for (Reiziger r : reizigers) {
             System.out.println(r);
@@ -119,7 +124,7 @@ class Main {
         Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
         System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.save() ");
         rdao.save(sietske);
-        reizigers = rdao.findAll();
+        reizigers = rdao.findAll(true);
         System.out.println(reizigers.size() + " reizigers\n");
     }
 
@@ -127,7 +132,7 @@ class Main {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
         // Haal alle reizigers op uit de database
-        List<Adres> adressen = adresDAOSql.findAll();
+        List<Adres> adressen = AdresDAOPsql.findAll(true);
         System.out.println("[Test] AdresDAO.findAll() geeft de volgende adressen:");
         for (Adres a : adressen) {
             System.out.println(a);

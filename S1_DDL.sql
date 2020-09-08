@@ -3,7 +3,7 @@ CREATE TYPE geslacht AS ENUM('M', 'V', 'Onzeker', 'Apache Helicopter');
 ALTER TABLE medewerkers ADD COLUMN m_geslacht_chk geslacht;
 SELECT * FROM medewerkers;
 
-UPDATE medewerkers SET m_geslacht_chk='X' WHERE naam='SMIT';
+UPDATE medewerkers SET m_geslacht_chk='V' WHERE naam='SMIT';
 -- [22P02] ERROR: invalid input value for enum geslacht: "X"
 
 -- S1.2. Nieuwe afdeling

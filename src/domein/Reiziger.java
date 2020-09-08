@@ -2,6 +2,7 @@ package domein;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Reiziger {
@@ -9,6 +10,7 @@ public class Reiziger {
     private String voorletters, tussenvoegsel, achternaam;
     private Date date;
     private Adres adres;
+    private ArrayList<OVChipKaart> chipkaarten = new ArrayList<>();
 
     public Reiziger(int reiziger_id, String voorletters, String tussenvoegsel, String achternaam, Date date) {
         this.reiziger_id = reiziger_id;
@@ -93,5 +95,17 @@ public class Reiziger {
     @Override
     public int hashCode() {
         return Objects.hash(reiziger_id, voorletters, tussenvoegsel, achternaam, date);
+    }
+
+    public void addKaart(OVChipKaart chipkaart) {
+        this.chipkaarten.add(chipkaart);
+    }
+
+    public ArrayList<OVChipKaart> getChipkaarten() {
+        return chipkaarten;
+    }
+
+    public void setChipkaarten(ArrayList<OVChipKaart> chipkaarten) {
+        this.chipkaarten = chipkaarten;
     }
 }
