@@ -6,6 +6,8 @@
     <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_orderlines_student.sql" dialect="PostgreSQL" />
     <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_orders_student.sql" dialect="PostgreSQL" />
     <file url="file://$USER_HOME$/Downloads/DataPersistency-student-master/casus/sales/sales_insert_stockitems_student.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/S1_DDL.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/S2_DML.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/Main.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/dao/reizigerDAOSql.java" dialect="GenericSQL" />
   </component>
