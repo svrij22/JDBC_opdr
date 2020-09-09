@@ -53,6 +53,13 @@ inner join
          uitvoeringen u on c.code = u.cursus
 where
     locatie='UTRECHT' or locatie='MAASTRICHT';
+
+-- oh woops
+
+SELECT
+    cursus, begindatum from uitvoeringen
+where
+    locatie='UTRECHT' or locatie='MAASTRICHT';
 -- S2.4. Namen
 --
 -- Geef de naam en voorletters van alle medewerkers, behalve van R. Jansen.

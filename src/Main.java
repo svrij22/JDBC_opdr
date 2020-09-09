@@ -80,6 +80,8 @@ class Main {
             System.out.println("gevonden reiziger " + DAOS.findByGb("1800-03-02", true));
 
             //OV TEST
+            OVChipKaart nkaart = new OVChipKaart(177, 1, 1, Date.valueOf("1990-09-10"), 23.90);
+            OVDAO.delete(nkaart);
             testOVDAO(OVDAO);
 
         }catch (Exception e){
@@ -149,7 +151,7 @@ class Main {
     }
 
     private static void testOVDAO(OVChipkaartDAO ovdao) throws Exception {
-        System.out.println("\n---------- Test ReizigerDAO -------------");
+        System.out.println("\n---------- Test OVChipkaartDAO -------------");
 
         // Haal alle reizigers op uit de database
         List<OVChipKaart> kaarten = ovdao.findAll(true);

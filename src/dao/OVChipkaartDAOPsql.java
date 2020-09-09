@@ -21,7 +21,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     public boolean save(OVChipKaart ovchip) throws Exception {
         //Already exists
         if (this.nummerExists(ovchip.getKaartnummer())){
-            throw new Exception("Reiziger met deze ID bestaat al.");
+            throw new Exception("OVCHIP met deze ID bestaat al.");
         }
 
         //Create statement
@@ -118,8 +118,10 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
                 //Get adress and link both ways
                 List<Adres> adres = AdresDAOPsql.DAO.findByReiziger(reiziger, false);
                 Adres adres1 = (adres.size() > 0) ? adres.get(0) : null;
-                if (adres1 != null) adres1.setReiziger(reiziger);
-                reiziger.setAdres(adres1);
+                if (adres1 != null) {
+                    adres1.setReiziger(reiziger);
+                    reiziger.setAdres(adres1);
+                }
             }
 
             //Add to list

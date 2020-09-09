@@ -100,6 +100,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
     public List<Reiziger> reizigerRsToList(ResultSet rs, boolean link) throws SQLException {
         ArrayList<Reiziger> reizigers = new ArrayList<>();
 
+        //While has next reiziger.
         while (rs.next()){
 
             //Link the values to a new object
@@ -113,6 +114,7 @@ public class ReizigerDAOPsql implements ReizigerDAO {
 
             //Links the reiziger and adres
             if (link){
+                //Get adres and link both ways
                 List<Adres> adres = AdresDAOPsql.DAO.findByReiziger(reiz, false);
                 Adres adres1 = (adres.size() > 0) ? adres.get(0) : null;
                 if (adres1 != null) adres1.setReiziger(reiz);
