@@ -58,16 +58,19 @@ GROUP BY i.cursus, i.begindatum
 HAVING count(i.cursus) >= 3;
 
 -- final
-select i.cursus, i.begindatum, count(*) as a_ins
-from uitvoeringen u join inschrijvingen i on u.cursus = i.cursus and u.begindatum = i.begindatum
-GROUP BY i.cursus, i.begindatum
-HAVING count(i.cursus) >= 3;
+select cursus, begindatum, count(*) as aantal_inschrijvingen
+from inschrijvingen
+GROUP BY cursus, begindatum
+HAVING count(*) >= 3;
 
 -- S4.4.
 -- Welke medewerkers hebben een bepaalde cursus meer dan één keer gevolgd?
 -- Geef medewerkernummer en cursuscode.
 -- DROP VIEW IF EXISTS s4_4; CREATE OR REPLACE VIEW s4_4 AS                                                     -- [TEST]
 
+select cursist, cursus, count(*) as aantal_keer from inschrijvingen
+group by cursist, cursus
+having count(*) > 1;
 
 -- S4.5. 
 -- Hoeveel uitvoeringen (`aantal`) zijn er gepland per cursus?
@@ -80,6 +83,10 @@ HAVING count(i.cursus) >= 3;
 --   OAG    | 2 
 -- DROP VIEW IF EXISTS s4_5; CREATE OR REPLACE VIEW s4_5 AS                                                     -- [TEST]
 
+select cursus, count(*)
+from uitvoeringen
+group by cursus
+order by count(*) desc;
 
 -- S4.6. 
 -- Bepaal hoeveel jaar leeftijdsverschil er zit tussen de oudste en de 
@@ -87,7 +94,9 @@ HAVING count(i.cursus) >= 3;
 -- de medewerkers (`gemiddeld`).
 -- Je mag hierbij aannemen dat elk jaar 365 dagen heeft.
 -- DROP VIEW IF EXISTS s4_6; CREATE OR REPLACE VIEW s4_6 AS                                                     -- [TEST]
-
+select concat((max(gbdatum)-min(gbdatum))/365, ' jaar') as grootste_verschil,
+       to_timestamp(avg(extract(epoch from gbdatum)))::date AS gemiddeld
+       from medewerkers;
 
 -- S4.7. 
 -- Geef van het hele bedrijf een overzicht van het aantal medewerkers dat
@@ -96,7 +105,10 @@ HAVING count(i.cursus) >= 3;
 -- per verkoper is (`commissie_verkopers`).
 -- DROP VIEW IF EXISTS s4_7; CREATE OR REPLACE VIEW s4_7 AS                                                     -- [TEST]
 
-
+select count(*) as aantal_medewerkers,
+       round(sum(comm)/count(*), 2) as commissie_medewerkers,
+       round(avg(comm) filter ( where functie='VERKOPER' ),2)
+       from medewerkers;
 
 -- -------------------------[ HU TESTRAAMWERK ]--------------------------------
 -- Met onderstaande query kun je je code testen. Zie bovenaan dit bestand

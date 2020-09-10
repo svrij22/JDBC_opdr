@@ -85,12 +85,14 @@ public class AdresDAOPsql implements AdresDAO{
     }
 
     @Override
-    public List<Adres> findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
+    public Adres findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
         int reiziger_id = reiziger.getReiziger_id();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM adres WHERE reiziger_id=?");
         stmt.setInt(1, reiziger_id);
         ResultSet rs = stmt.executeQuery(); // Get results
-        return adresRsToList(rs, link);
+        Adres adres = adresRsToList(rs, link).get(0);
+        adres.setReiziger(reiziger);
+        return adres;
     }
 
     @Override
