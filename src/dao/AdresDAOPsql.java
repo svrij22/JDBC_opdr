@@ -1,11 +1,13 @@
 package dao;
 
 import domein.Adres;
+import domein.OVChipKaart;
 import domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
 
@@ -86,13 +88,19 @@ public class AdresDAOPsql implements AdresDAO{
 
     @Override
     public Adres findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
+        //Prepare statement and do query
         int reiziger_id = reiziger.getReiziger_id();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM adres WHERE reiziger_id=?");
         stmt.setInt(1, reiziger_id);
         ResultSet rs = stmt.executeQuery(); // Get results
-        Adres adres = adresRsToList(rs, link).get(0);
-        adres.setReiziger(reiziger);
-        return adres;
+
+        //Get first address.
+        ArrayList<Adres> adressen = adresRsToList(rs, link);
+        if (!(adressen.size() >  0)) return null;
+
+        Adres adres1 = adressen.get(0);
+        adres1.setReiziger(reiziger);
+        return adres1;
     }
 
     @Override
@@ -117,11 +125,17 @@ public class AdresDAOPsql implements AdresDAO{
                     rs.getString("woonplaats")
             );
 
-            //Links the reiziger and adres
             if (link){
+                //Links adres and reiziger both ways
                 Reiziger reiz = ReizigerDAOPsql.DAO.findById(adres.getReiziger_id(), false);
                 reiz.setAdres(adres);
                 adres.setReiziger(reiz);
+
+                //Get OVKaarten and link both ways
+                List<OVChipKaart> kaarten = OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
+                for (OVChipKaart kaart : kaarten ) {
+                    kaart.setReiziger(reiz);
+                }
             }
 
             //Add to list

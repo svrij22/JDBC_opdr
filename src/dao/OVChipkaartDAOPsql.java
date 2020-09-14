@@ -2,6 +2,7 @@ package dao;
 
 import domein.Adres;
 import domein.OVChipKaart;
+import domein.Product;
 import domein.Reiziger;
 
 import java.sql.*;
@@ -12,9 +13,11 @@ import static java.lang.Integer.parseInt;
 
 public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     Connection connection;
+    public static OVChipkaartDAOPsql DAO;
 
     public OVChipkaartDAOPsql(Connection connection) {
         this.connection = connection;
+        DAO = this;
     }
 
     @Override
@@ -76,12 +79,17 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     }
 
     @Override
-    public List<OVChipKaart> findByReiziger(Reiziger reiziger) throws SQLException {
-        ArrayList<OVChipKaart> ovkaarten = new ArrayList<>();
-        for (OVChipKaart ov : this.findAll(false)) {
-            if (reiziger.getReiziger_id() == ov.getReiziger_id()) ovkaarten.add(ov);
-        }
-        return ovkaarten;
+    public List<OVChipKaart> findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
+        //Prepare statement
+        int reiziger_id = reiziger.getReiziger_id();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM ov_chipkaart WHERE reiziger_id=?");
+        stmt.setInt(1, reiziger_id);
+
+        //Get address list
+        ResultSet rs = stmt.executeQuery(); // Get results
+        List<OVChipKaart> kaarten = ovRsToList(rs, link);
+        reiziger.setKaarten(kaarten);
+        return kaarten;
     }
 
     @Override
@@ -108,19 +116,23 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
             //Links the reiziger, adres and OV
             if (link){
 
-                //Find reiziger
-                Reiziger reiziger = ReizigerDAOPsql.DAO.findById(chipkaart.getReiziger_id(), true);
-
                 //Link kaart both ways
+                Reiziger reiziger = ReizigerDAOPsql.DAO.findById(chipkaart.getReiziger_id(), false);
                 reiziger.addKaart(chipkaart);
                 chipkaart.setReiziger(reiziger);
 
                 //Get adress and link both ways
-                List<Adres> adres = AdresDAOPsql.DAO.findByReiziger(reiziger, false);
-                Adres adres1 = (adres.size() > 0) ? adres.get(0) : null;
-                if (adres1 != null) {
-                    adres1.setReiziger(reiziger);
-                    reiziger.setAdres(adres1);
+                Adres adres = AdresDAOPsql.DAO.findByReiziger(reiziger, false);
+                if (adres != null) {
+                    adres.setReiziger(reiziger);
+                    reiziger.setAdres(adres);
+                }
+
+                //Link all products both ways
+                List<Product> products = ProductDAOPsql.DAO.findByOV(chipkaart, false);
+                if (products.size() > 0){
+                    chipkaart.setProducten((ArrayList<Product>) products);
+                    for (Product prod:products) prod.addOVKaart(chipkaart);
                 }
             }
 

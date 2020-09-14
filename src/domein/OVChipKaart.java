@@ -1,5 +1,6 @@
 package domein;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class OVChipKaart {
@@ -7,6 +8,19 @@ public class OVChipKaart {
     private Date geldig_tot;
     private double saldo;
     private Reiziger reiziger;
+    private ArrayList<Product> producten;
+
+    public ArrayList<Product> getProducten() {
+        return producten;
+    }
+
+    public void addProduct(Product p){
+        this.producten.add(p);
+    }
+
+    public void setProducten(ArrayList<Product> producten) {
+        this.producten = producten;
+    }
 
     public OVChipKaart(int kaartnummer, int klasse, int reiziger_id, Date geldig_tot, double saldo) {
         this.kaartnummer = kaartnummer;
@@ -73,6 +87,7 @@ public class OVChipKaart {
                 ", geldig_tot=" + geldig_tot +
                 ", saldo=" + saldo +
                 ", reiziger=" + reiziger +
+                ", producten=" + producten +
                 '}';
     }
 }

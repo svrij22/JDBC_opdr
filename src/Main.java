@@ -1,6 +1,7 @@
 import dao.*;
 import domein.Adres;
 import domein.OVChipKaart;
+import domein.Product;
 import domein.Reiziger;
 
 import java.sql.*;
@@ -20,6 +21,7 @@ class Main {
             ReizigerDAOPsql DAOS = new ReizigerDAOPsql(conn);
             AdresDAOPsql ADAOS = new AdresDAOPsql(conn);
             OVChipkaartDAOPsql OVDAO = new OVChipkaartDAOPsql(conn);
+            ProductDAOPsql PDAO = new ProductDAOPsql(conn);
 
             List<Reiziger> alleReizigers = DAOS.findAll(true);
             for (Reiziger r : alleReizigers){
@@ -83,6 +85,7 @@ class Main {
             OVChipKaart nkaart = new OVChipKaart(177, 1, 1, Date.valueOf("1990-09-10"), 23.90);
             OVDAO.delete(nkaart);
             testOVDAO(OVDAO);
+            testProdDAO(PDAO);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -167,5 +170,17 @@ class Main {
         ovdao.save(nkaart);
         kaarten = ovdao.findAll(true);
         System.out.println(kaarten.size() + " reizigers\n");
+    }
+
+    private static void testProdDAO(ProductDAO dao) throws Exception {
+        System.out.println("\n---------- Test testProdDAO -------------");
+
+        // Haal alle reizigers op uit de database
+        List<Product> products = dao.findAll(true);
+        System.out.println("[Test] testProdDAO.findAll() geeft de volgende producten:");
+        for (Product prod : products) {
+            System.out.println(prod);
+        }
+        System.out.println();
     }
 }

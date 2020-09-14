@@ -3,6 +3,7 @@ package domein;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Reiziger {
@@ -99,6 +100,10 @@ public class Reiziger {
 
     public void addKaart(OVChipKaart chipkaart) {
         this.chipkaarten.add(chipkaart);
+    }
+
+    public void setKaarten(List<OVChipKaart> kaarten){
+        this.chipkaarten = (ArrayList<OVChipKaart>) kaarten;
     }
 
     public ArrayList<OVChipKaart> getChipkaarten() {

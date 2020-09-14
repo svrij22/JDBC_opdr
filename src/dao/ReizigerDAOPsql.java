@@ -1,6 +1,7 @@
 package dao;
 
 import domein.Adres;
+import domein.OVChipKaart;
 import domein.Reiziger;
 
 import java.sql.*;
@@ -118,6 +119,12 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                 Adres adres = AdresDAOPsql.DAO.findByReiziger(reiz, false);
                 if (adres != null) adres.setReiziger(reiz);
                 reiz.setAdres(adres);
+
+                //Get OVKaarten and link both ways
+                List<OVChipKaart> kaarten = OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
+                for (OVChipKaart kaart : kaarten ) {
+                    kaart.setReiziger(reiz);
+                }
             }
 
             //Add to list
