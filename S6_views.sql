@@ -46,10 +46,14 @@ select * from dagcursussen;
 -- 2. Maak een tweede view met de naam "daguitvoeringen".
 --    Deze view dient de uitvoeringsgegevens op te halen voor de "dagcurssussen" (gebruik ook de view "dagcursussen"). Toon aan dat de view werkt
 
-REPLACE VIEW daguitvoeringen AS
+CREATE OR REPLACE VIEW daguitvoeringen AS
     SELECT * FROM uitvoeringen
-    JOIN cursussen c on uitvoeringen.cursus = c.code;
+    JOIN dagcursussen c on uitvoeringen.cursus = c.code;
 
 select * from daguitvoeringen;
 
 -- 3. Verwijder de views en laat zien wat de verschillen zijn bij DROP view <viewnaam> CASCADE en bij DROP view <viewnaam> RESTRICT
+
+DROP view dagcursussen CASCADE;
+
+-- CASCADE dropt ook daguitvoeringen omdat die leunt op de dagcursussen view
