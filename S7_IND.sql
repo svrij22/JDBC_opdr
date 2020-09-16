@@ -132,6 +132,22 @@ where c.customer_id in (select customer_id from customer_wto_145)
   and o.order_id in (select order_id from orders_over_q250)
 order by quantity, average_delivery_time;
 
+select customer_id
+from orders
+group by customer_id
+having (avg(expected_delivery_date - order_date) > 1.45);
+
+-- one query
+select order_id, order_date, salesperson_person_id from orders
+where customer_id in
+    (select customer_id
+    from orders
+    group by customer_id
+    having (avg(expected_delivery_date - order_date) > 1.45))
+and order_id in
+    (select order_id from order_lines
+    where quantity > 250);
+
 select * from orders;
 drop view stock_items_q250 cascade;
 
