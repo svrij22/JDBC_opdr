@@ -7,6 +7,7 @@ import domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ProductDAOPsql implements ProductDAO {
@@ -92,6 +93,7 @@ public class ProductDAOPsql implements ProductDAO {
 
     public List<Product> productRsToLs(ResultSet rs, boolean link) throws SQLException {
         ArrayList<Product> products = new ArrayList<>();
+        HashSet<OVChipKaart> ovkaarten = new HashSet<>();
 
         //While has next product.
         while (rs.next()){
@@ -104,9 +106,20 @@ public class ProductDAOPsql implements ProductDAO {
                     rs.getDouble("prijs")
             );
 
-            //Links the products and ovchipcards
+            //Link all products both ways
+            //HashSet only allows 1 unique prods
             if (link){
-
+                List<OVChipKaart> matchingOVs = OVChipkaartDAOPsql.DAO.findByProd(prod.getProduct_nummer(), true);
+                ovkaarten.addAll(matchingOVs);
+                if (ovkaarten.size() > 0){
+                    for (OVChipKaart ov : ovkaarten) {
+                        ov.setProducten(new ArrayList<>()); //Reset list
+                        if (matchingOVs.contains(ov)) {
+                            prod.addOVKaart(ov);
+                            ov.addProduct(prod);
+                        }
+                    }
+                }
             }
 
             //Add to list

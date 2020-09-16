@@ -98,8 +98,10 @@ public class AdresDAOPsql implements AdresDAO{
         ArrayList<Adres> adressen = adresRsToList(rs, link);
         if (!(adressen.size() >  0)) return null;
 
+        //Link
         Adres adres1 = adressen.get(0);
         adres1.setReiziger(reiziger);
+        reiziger.setAdres(adres1);
         return adres1;
     }
 
@@ -132,10 +134,7 @@ public class AdresDAOPsql implements AdresDAO{
                 adres.setReiziger(reiz);
 
                 //Get OVKaarten and link both ways
-                List<OVChipKaart> kaarten = OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
-                for (OVChipKaart kaart : kaarten ) {
-                    kaart.setReiziger(reiz);
-                }
+                OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
             }
 
             //Add to list

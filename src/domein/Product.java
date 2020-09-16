@@ -1,6 +1,7 @@
 package domein;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Product {
     private int product_nummer;
@@ -68,5 +69,21 @@ public class Product {
                 ", beschrijving='" + beschrijving + '\'' +
                 ", price=" + price +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return product_nummer == product.product_nummer &&
+                Double.compare(product.price, price) == 0 &&
+                name.equals(product.name) &&
+                beschrijving.equals(product.beschrijving);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(product_nummer, name, beschrijving, price);
     }
 }

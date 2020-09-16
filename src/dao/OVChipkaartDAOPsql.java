@@ -7,6 +7,7 @@ import domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -78,6 +79,13 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         return null;
     }
 
+    public List<OVChipKaart> findByProd(int productNum, boolean link) throws SQLException {
+        PreparedStatement stmt = connection.prepareStatement("select * from ov_chipkaart o join ov_chipkaart_product ocp on o.kaart_nummer = ocp.kaart_nummer where product_nummer=?");
+        stmt.setInt(1, productNum);
+        ResultSet rs = stmt.executeQuery(); // Get results
+        return ovRsToList(rs, link);
+    }
+
     @Override
     public List<OVChipKaart> findByReiziger(Reiziger reiziger, boolean link) throws SQLException {
         //Prepare statement
@@ -88,7 +96,12 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         //Get address list
         ResultSet rs = stmt.executeQuery(); // Get results
         List<OVChipKaart> kaarten = ovRsToList(rs, link);
+
+        //Link or .. re-link really..
         reiziger.setKaarten(kaarten);
+        for (OVChipKaart kaart : kaarten )
+            kaart.setReiziger(reiziger);
+
         return kaarten;
     }
 
@@ -102,6 +115,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
     public List<OVChipKaart> ovRsToList(ResultSet rs, boolean link) throws SQLException {
         ArrayList<OVChipKaart> ovChipKaarten = new ArrayList<>();
+        HashSet<Product> products = new HashSet<>();
 
         while (rs.next()){
             //Link the values to a new object
@@ -122,17 +136,19 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
                 chipkaart.setReiziger(reiziger);
 
                 //Get adress and link both ways
-                Adres adres = AdresDAOPsql.DAO.findByReiziger(reiziger, false);
-                if (adres != null) {
-                    adres.setReiziger(reiziger);
-                    reiziger.setAdres(adres);
-                }
+                AdresDAOPsql.DAO.findByReiziger(reiziger, false);
 
                 //Link all products both ways
-                List<Product> products = ProductDAOPsql.DAO.findByOV(chipkaart, false);
+                //HashSet only allows 1 unique prods
+                List<Product> matchingProds = ProductDAOPsql.DAO.findByOV(chipkaart, false);
+                products.addAll(matchingProds);
                 if (products.size() > 0){
-                    chipkaart.setProducten((ArrayList<Product>) products);
-                    for (Product prod:products) prod.addOVKaart(chipkaart);
+                    for (Product prod:products) {
+                        if (matchingProds.contains(prod)) {
+                            prod.addOVKaart(chipkaart);
+                            chipkaart.addProduct(prod);
+                        }
+                    }
                 }
             }
 

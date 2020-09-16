@@ -180,7 +180,10 @@ class Main {
         System.out.println("[Test] testProdDAO.findAll() geeft de volgende producten:");
         for (Product prod : products) {
             System.out.println(prod);
+            System.out.println(prod.getOvChipKaarten());
         }
+
+        //Get all ovkaarten
         System.out.println();
     }
 }

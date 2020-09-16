@@ -113,18 +113,13 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                     rs.getDate("geboortedatum")
             );
 
-            //Links the reiziger and adres
-            if (link){
-                //Get adres and link both ways
-                Adres adres = AdresDAOPsql.DAO.findByReiziger(reiz, false);
-                if (adres != null) adres.setReiziger(reiz);
-                reiz.setAdres(adres);
 
-                //Get OVKaarten and link both ways
-                List<OVChipKaart> kaarten = OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
-                for (OVChipKaart kaart : kaarten ) {
-                    kaart.setReiziger(reiz);
-                }
+            //Links the reiziger and adres
+            //Get adres and link both ways
+            //Get OVKaarten and link both ways
+            if (link){
+                AdresDAOPsql.DAO.findByReiziger(reiz, false);
+                OVChipkaartDAOPsql.DAO.findByReiziger(reiz, true);
             }
 
             //Add to list

@@ -2,13 +2,14 @@ package domein;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class OVChipKaart {
     private int kaartnummer, klasse, reiziger_id;
     private Date geldig_tot;
     private double saldo;
     private Reiziger reiziger;
-    private ArrayList<Product> producten;
+    private ArrayList<Product> producten = new ArrayList<>();
 
     public ArrayList<Product> getProducten() {
         return producten;
@@ -89,5 +90,21 @@ public class OVChipKaart {
                 ", reiziger=" + reiziger +
                 ", producten=" + producten +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OVChipKaart that = (OVChipKaart) o;
+        return kaartnummer == that.kaartnummer &&
+                klasse == that.klasse &&
+                reiziger_id == that.reiziger_id &&
+                geldig_tot.equals(that.geldig_tot);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(kaartnummer, klasse, reiziger_id, geldig_tot);
     }
 }
