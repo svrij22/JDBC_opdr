@@ -111,9 +111,11 @@ public class ProductDAOPsql implements ProductDAO {
             if (link){
                 List<OVChipKaart> matchingOVs = OVChipkaartDAOPsql.DAO.findByProd(prod.getProduct_nummer(), true);
                 ovkaarten.addAll(matchingOVs);
+                for (OVChipKaart ov : matchingOVs)
+                    ov.setProducten(new ArrayList<>()); //Reset list
+
                 if (ovkaarten.size() > 0){
                     for (OVChipKaart ov : ovkaarten) {
-                        ov.setProducten(new ArrayList<>()); //Reset list
                         if (matchingOVs.contains(ov)) {
                             prod.addOVKaart(ov);
                             ov.addProduct(prod);

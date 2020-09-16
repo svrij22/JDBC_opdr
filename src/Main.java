@@ -6,6 +6,7 @@ import domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -156,11 +157,16 @@ class Main {
     private static void testOVDAO(OVChipkaartDAO ovdao) throws Exception {
         System.out.println("\n---------- Test OVChipkaartDAO -------------");
 
+        HashSet<OVChipKaart> ovs = new HashSet<>();
+        HashSet<Reiziger> reiz = new HashSet<>();
+        HashSet<Adres> adressen = new HashSet<>();
+
         // Haal alle reizigers op uit de database
         List<OVChipKaart> kaarten = ovdao.findAll(true);
         System.out.println("[Test] OVChipkaartDAO.findAll() geeft de volgende kaarten:");
         for (OVChipKaart ov : kaarten) {
             System.out.println(ov);
+            reiz.add(ov.getReiziger());
         }
         System.out.println();
 
@@ -170,6 +176,20 @@ class Main {
         ovdao.save(nkaart);
         kaarten = ovdao.findAll(true);
         System.out.println(kaarten.size() + " reizigers\n");
+
+        //Print all Reizigers
+        System.out.println("[Test] Al deze OVs hebben de volgende reizigers:");
+        for (Reiziger r : reiz) {
+            System.out.println(r);
+            adressen.add(r.getAdres());
+        }
+        System.out.println();
+
+        //Print all Adressen
+        System.out.println("[Test] Al deze reizigers hebben de volgende adressen:");
+        for (Adres a : adressen) {
+            System.out.println(a);
+        }
     }
 
     private static void testProdDAO(ProductDAO dao) throws Exception {
@@ -178,9 +198,37 @@ class Main {
         // Haal alle reizigers op uit de database
         List<Product> products = dao.findAll(true);
         System.out.println("[Test] testProdDAO.findAll() geeft de volgende producten:");
+        HashSet<OVChipKaart> ovs = new HashSet<>();
+        HashSet<Reiziger> reiz = new HashSet<>();
+        HashSet<Adres> adressen = new HashSet<>();
+
+        //Print all prods
         for (Product prod : products) {
             System.out.println(prod);
-            System.out.println(prod.getOvChipKaarten());
+            ovs.addAll(prod.getOvChipKaarten());
+        }
+        System.out.println();
+
+        //Print all OVS
+        System.out.println("[Test] Al deze producten hebben de volgende OVs:");
+        for (OVChipKaart ov : ovs) {
+            System.out.println(ov);
+            reiz.add(ov.getReiziger());
+        }
+        System.out.println();
+
+        //Print all Reizigers
+        System.out.println("[Test] Al deze OVs hebben de volgende reizigers:");
+        for (Reiziger r : reiz) {
+            System.out.println(r);
+            adressen.add(r.getAdres());
+        }
+        System.out.println();
+
+        //Print all Adressen
+        System.out.println("[Test] Al deze reizigers hebben de volgende adressen:");
+        for (Adres a : adressen) {
+            System.out.println(a);
         }
 
         //Get all ovkaarten

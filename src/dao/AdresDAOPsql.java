@@ -134,7 +134,7 @@ public class AdresDAOPsql implements AdresDAO{
                 adres.setReiziger(reiz);
 
                 //Get OVKaarten and link both ways
-                OVChipkaartDAOPsql.DAO.findByReiziger(reiz, false);
+                OVChipkaartDAOPsql.DAO.findByReiziger(reiz, true);
             }
 
             //Add to list
