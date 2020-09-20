@@ -99,57 +99,17 @@ DROP INDEX orders_cust_id_idx;
 -- Sorteer het resultaat van de hele geheel op levertijd (desc) en verkoper.
 -- 1. Maak hieronder deze query (als je het goed doet zouden er 377 rijen uit moeten komen, en het kan best even duren...)
 
--- Average deliveries per customer
-create or replace view average_deliveries_per_customer as
-select avg(expected_delivery_date - order_date) as average_delivery_time, customer_id
-from orders o group by customer_id order by customer_id;
-
--- All customers with avg deliv over 1.45 days
-create or replace view customer_wto_145 as
-select * from average_deliveries_per_customer avg
-where (average_delivery_time > 1.45);
-
--- All orders with quantity over 250
-create or replace view orders_over_q250 as
-select * from order_lines
-where quantity > 250;
-
--- Select order from customers with above average dtime and orders w quantity over 250
-select order_id, order_date, salesperson_person_id
-from orders
-where customer_id in (select customer_id from customer_wto_145)
-and order_id in (select order_id from orders_over_q250);
--- Select order from customers with above average dtime and orders w quantity over 250
-select
-    ol.order_id, quantity,
-       (c.customer_id in (select customer_id from customer_wto_145)) as customer_avg_time_over145,
-       average_delivery_time as avg_delivery_time,
-       order_date, salesperson_person_id
-from orders o
-    join orders_over_q250 ol on o.order_id = ol.order_id
-    join customer_wto_145 c on o.customer_id = c.customer_id
-where c.customer_id in (select customer_id from customer_wto_145)
-  and o.order_id in (select order_id from orders_over_q250)
-order by quantity, average_delivery_time;
-
-select customer_id
-from orders
-group by customer_id
-having (avg(expected_delivery_date - order_date) > 1.45);
-
 -- one query
 select order_id, order_date, salesperson_person_id from orders
-where customer_id in
-    (select customer_id
+where salesperson_person_id in
+    (select salesperson_person_id
     from orders
-    group by customer_id
+    group by salesperson_person_id
     having (avg(expected_delivery_date - order_date) > 1.45))
 and order_id in
     (select order_id from order_lines
     where quantity > 250);
 
-select * from orders;
-drop view stock_items_q250 cascade;
 
 -- S7.3.B
 --
@@ -157,8 +117,18 @@ drop view stock_items_q250 cascade;
 -- 2. Kijk of je met 1 of meer indexen de query zou kunnen versnellen
 -- 3. Maak de index(en) aan en run nogmaals het EXPLAIN plan (kopieer weer onder de opdracht)
 -- 4. Wat voor verschillen zie je? Verklaar hieronder.
+explain select order_id, order_date, salesperson_person_id from orders
+where salesperson_person_id in
+      (select salesperson_person_id
+       from orders
+       group by salesperson_person_id
+       having (avg(expected_delivery_date - order_date) > 1.45))
+  and order_id in
+      (select order_id from order_lines
+       where quantity > 250);
 
-
+CREATE INDEX sales_p_id_idx ON orders (salesperson_person_id);
+CREATE INDEX orders_cust_id_idx ON orders (customer_id);
 
 -- S7.3.C
 --
