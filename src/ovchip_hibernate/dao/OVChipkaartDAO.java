@@ -1,7 +1,7 @@
-package dao;
+package ovchip_hibernate.dao;
 
-import domein.OVChipKaart;
-import domein.Reiziger;
+import ovchip_dao.domein.OVChipKaart;
+import ovchip_dao.domein.Reiziger;
 
 import java.sql.SQLException;
 import java.util.List;

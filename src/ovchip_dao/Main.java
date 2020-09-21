@@ -1,8 +1,10 @@
-import dao.*;
-import domein.Adres;
-import domein.OVChipKaart;
-import domein.Product;
-import domein.Reiziger;
+package ovchip_dao;
+
+import ovchip_dao.dao.*;
+import ovchip_dao.domein.Adres;
+import ovchip_dao.domein.OVChipKaart;
+import ovchip_dao.domein.Product;
+import ovchip_dao.domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ class Main {
 
     public static void main(String[] args){
         try {
+
             Main.getConnection();
             Main.opdracht1();
 

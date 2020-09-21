@@ -1,9 +1,8 @@
-package dao;
+package ovchip_dao.dao;
 
-import domein.Reiziger;
+import ovchip_dao.domein.Reiziger;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ReizigerDAO {

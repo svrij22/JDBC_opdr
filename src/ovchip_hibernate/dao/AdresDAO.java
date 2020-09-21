@@ -1,11 +1,10 @@
-package dao;
+package ovchip_hibernate.dao;
 
-import domein.Adres;
-import domein.Reiziger;
+import ovchip_dao.domein.Adres;
+import ovchip_dao.domein.Reiziger;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public interface AdresDAO {
     public boolean save(Adres adres) throws Exception;

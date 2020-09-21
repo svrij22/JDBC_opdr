@@ -1,34 +1,51 @@
-package domein;
+package ovchip_hibernate.domein;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "ov_chipkaart", schema = "public", catalog = "ovchip")
 public class OVChipKaart {
-    private int kaartnummer, klasse, reiziger_id;
+
+    @Id @GeneratedValue private int kaart_nummer;
+    private int reiziger_id;
+    private int klasse;
     private Date geldig_tot;
     private double saldo;
-    private Reiziger reiziger;
-    private ArrayList<Product> producten = new ArrayList<>();
 
-    public ArrayList<Product> getProducten() {
-        return producten;
+    @ManyToOne
+    @JoinColumn(name = "reiziger_id", insertable = false, updatable = false)
+    private Reiziger reiziger;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "ov_chipkaart_product",
+            joinColumns = {@JoinColumn(name = "kaart_nummer")},
+            inverseJoinColumns = {@JoinColumn(name = "product_nummer")})
+    private List<Product> producten;
+
+    public OVChipKaart() {
+        this.producten = new ArrayList<Product>();
     }
+
+    public OVChipKaart(int kaartnummer, int klasse, int reiziger_id, Date geldig_tot, double saldo) {
+        this.kaart_nummer = kaartnummer;
+        this.klasse = klasse;
+        this.reiziger_id = reiziger_id;
+        this.geldig_tot = geldig_tot;
+        this.saldo = saldo;
+    }
+
+    public List<Product> getProducten() { return producten; }
 
     public void addProduct(Product p){
         this.producten.add(p);
     }
 
-    public void setProducten(ArrayList<Product> producten) {
+    public void setProducten(List<Product> producten) {
         this.producten = producten;
-    }
-
-    public OVChipKaart(int kaartnummer, int klasse, int reiziger_id, Date geldig_tot, double saldo) {
-        this.kaartnummer = kaartnummer;
-        this.klasse = klasse;
-        this.reiziger_id = reiziger_id;
-        this.geldig_tot = geldig_tot;
-        this.saldo = saldo;
     }
 
     public Reiziger getReiziger() {
@@ -40,11 +57,11 @@ public class OVChipKaart {
     }
 
     public int getKaartnummer() {
-        return kaartnummer;
+        return kaart_nummer;
     }
 
     public void setKaartnummer(int kaartnummer) {
-        this.kaartnummer = kaartnummer;
+        this.kaart_nummer = kaartnummer;
     }
 
     public int getKlasse() {
@@ -82,7 +99,7 @@ public class OVChipKaart {
     @Override
     public String toString() {
         return "OVChipKaart{" +
-                "kaartnummer=" + kaartnummer +
+                "kaartnummer=" + kaart_nummer +
                 ", klasse=" + klasse +
                 ", reiziger_id=" + reiziger_id +
                 ", geldig_tot=" + geldig_tot +
@@ -97,7 +114,7 @@ public class OVChipKaart {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OVChipKaart that = (OVChipKaart) o;
-        return kaartnummer == that.kaartnummer &&
+        return kaart_nummer == that.kaart_nummer &&
                 klasse == that.klasse &&
                 reiziger_id == that.reiziger_id &&
                 geldig_tot.equals(that.geldig_tot);
@@ -105,6 +122,6 @@ public class OVChipKaart {
 
     @Override
     public int hashCode() {
-        return Objects.hash(kaartnummer, klasse, reiziger_id, geldig_tot);
+        return Objects.hash(kaart_nummer, klasse, reiziger_id, geldig_tot);
     }
 }

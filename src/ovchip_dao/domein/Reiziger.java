@@ -1,7 +1,6 @@
-package domein;
+package ovchip_dao.domein;
 
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

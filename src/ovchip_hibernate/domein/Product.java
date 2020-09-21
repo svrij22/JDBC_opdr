@@ -1,16 +1,34 @@
-package domein;
+package ovchip_hibernate.domein;
 
+import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "product", schema = "public", catalog = "ovchip")
 public class Product {
-    private int product_nummer;
-    private String name;
-    private String beschrijving;
-    private double price;
-    private ArrayList<OVChipKaart> ovChipKaarten = new ArrayList<>();
 
-    public ArrayList<OVChipKaart> getOvChipKaarten() {
+    @Id @GeneratedValue private int product_nummer;
+    private String naam;
+    private String beschrijving;
+    private double prijs;
+
+    @ManyToMany(mappedBy = "producten")
+    private List<OVChipKaart> ovChipKaarten;
+
+    public Product() {
+        this.ovChipKaarten = new ArrayList<OVChipKaart>();
+    }
+
+    public Product(int product_nummer, String name, String beschrijving, double price) {
+        this.product_nummer = product_nummer;
+        this.naam = name;
+        this.beschrijving = beschrijving;
+        this.prijs = price;
+    }
+
+    public List<OVChipKaart> getOvChipKaarten() {
         return ovChipKaarten;
     }
 
@@ -22,13 +40,6 @@ public class Product {
         this.ovChipKaarten.add(ovChipKaart);
     }
 
-    public Product(int product_nummer, String name, String beschrijving, double price) {
-        this.product_nummer = product_nummer;
-        this.name = name;
-        this.beschrijving = beschrijving;
-        this.price = price;
-    }
-
     public int getProduct_nummer() {
         return product_nummer;
     }
@@ -37,12 +48,12 @@ public class Product {
         this.product_nummer = product_nummer;
     }
 
-    public String getName() {
-        return name;
+    public String getNaam() {
+        return naam;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNaam(String name) {
+        this.naam = name;
     }
 
     public String getBeschrijving() {
@@ -53,21 +64,22 @@ public class Product {
         this.beschrijving = beschrijving;
     }
 
-    public double getPrice() {
-        return price;
+    public double getPrijs() {
+        return prijs;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setPrijs(double prijs) {
+        this.prijs = prijs;
     }
 
     @Override
     public String toString() {
         return "Product{" +
                 "product_nummer=" + product_nummer +
-                ", name='" + name + '\'' +
+                ", name='" + naam + '\'' +
                 ", beschrijving='" + beschrijving + '\'' +
-                ", price=" + price +
+                ", price=" + prijs +
+                ", kaarten=" + ovChipKaarten.size() +
                 '}';
     }
 
@@ -77,13 +89,13 @@ public class Product {
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
         return product_nummer == product.product_nummer &&
-                Double.compare(product.price, price) == 0 &&
-                name.equals(product.name) &&
+                Double.compare(product.prijs, prijs) == 0 &&
+                naam.equals(product.naam) &&
                 beschrijving.equals(product.beschrijving);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(product_nummer, name, beschrijving, price);
+        return Objects.hash(product_nummer, naam, beschrijving, prijs);
     }
 }

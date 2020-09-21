@@ -1,9 +1,8 @@
-package dao;
+package ovchip_dao.dao;
 
-import domein.Adres;
-import domein.OVChipKaart;
-import domein.Product;
-import domein.Reiziger;
+import ovchip_dao.domein.OVChipKaart;
+import ovchip_dao.domein.Product;
+import ovchip_dao.domein.Reiziger;
 
 import java.sql.*;
 import java.util.ArrayList;

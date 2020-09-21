@@ -1,4 +1,4 @@
-package domein;
+package ovchip_dao.domein;
 
 public class Adres {
     private int adres_id, reiziger_id;
