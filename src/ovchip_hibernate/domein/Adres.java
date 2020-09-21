@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "adres", schema = "public", catalog = "ovchip")
 public class Adres {
 
-    @Id @GeneratedValue
+    @Id
     private int adres_id;
     private int reiziger_id;
     private String postcode;

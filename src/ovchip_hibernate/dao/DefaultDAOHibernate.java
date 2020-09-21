@@ -23,4 +23,10 @@ abstract class DefaultDAOHibernate {
         getCurrentSession().delete(object);
         commitTransaction();
     }
+
+    public interface DefaultDAO {
+        public void save(Object object);
+        public void update(Object object);
+        public void delete(Object object);
+    }
 }

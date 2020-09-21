@@ -53,6 +53,27 @@ public class Main {
         List<Product> prods = DAO.findByOV(ovChipKaart);
         System.out.println("Gevonden prods voor OVC 35283" + prods);
 
+        /*Product lijst*/
+        System.out.println("[Test] Alle objecten van type Producten uit database:");
+        prods = DAO.findAll();
+        for (Product prod : prods){
+            System.out.println(prod);
+        }
+
+        /*Product toevoegen*/
+        System.out.println("[Test]");
+        System.out.println("Producten aantal: " + prods.size());
+        Product newProd = new Product(7, "test", "test", 34.43);
+        DAO.save(newProd);
+        prods = DAO.findAll();
+        System.out.println("Producten aantal na toevoegen: " + prods.size());
+
+        /*Product weer verwijderen*/
+        System.out.println("[Test]");
+        DAO.delete(newProd);
+        prods = DAO.findAll();
+        System.out.println("Producten aantal na verwijderen: " + prods.size());
+
     }
 
     private static void testDAOHibernate() {
@@ -77,6 +98,7 @@ public class Main {
             System.out.println("Gevonden reiziger: " + gevondenReiziger);
 
             /*Reiziger toevoegen*/
+            System.out.println("[Test]");
             System.out.println("Reizigers aantal: " + reiz.size());
             Reiziger newReiziger = new Reiziger(24, "S","J","Vrij", Date.valueOf("2001-09-09"));
             RDAOH.save(newReiziger);
@@ -84,6 +106,7 @@ public class Main {
             System.out.println("Reizigers aantal na toevoegen: " + reiz.size());
 
             /*Reiziger aanpassen*/
+            System.out.println("[Test]");
             System.out.println("Reiziger geboortedatum: " + newReiziger.getGeboortedatum());
             newReiziger.setGeboortedatum(Date.valueOf("2001-09-03"));
             RDAOH.update(newReiziger);
@@ -91,6 +114,7 @@ public class Main {
             System.out.println("Reiziger gevonden: " + newReiziger);
 
             /*Reiziger weer verwijderen*/
+            System.out.println("[Test]");
             RDAOH.delete(newReiziger);
             reiz = RDAOH.findAll();
             System.out.println("Reizigers aantal na verwijderen: " + reiz.size());

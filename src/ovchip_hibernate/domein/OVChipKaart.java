@@ -10,7 +10,7 @@ import java.util.Objects;
 @Table(name = "ov_chipkaart", schema = "public", catalog = "ovchip")
 public class OVChipKaart {
 
-    @Id @GeneratedValue private int kaart_nummer;
+    @Id private int kaart_nummer;
     private int reiziger_id;
     private int klasse;
     private Date geldig_tot;

@@ -20,7 +20,7 @@ public class ProductDAOHibernate extends DefaultDAOHibernate implements ProductD
     }
 
     @Override
-    public List<Product> findAll(boolean link) {
+    public List<Product> findAll() {
         Query<Product> query = HibernateService.getCurrentSession().createQuery("from Product");
         return query.list();
     }
