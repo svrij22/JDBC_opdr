@@ -3,11 +3,9 @@ package ovchip_hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
-import org.hibernate.sql.ordering.antlr.Factory;
-import ovchip_hibernate.dao.ProductDAOHibernate;
-import ovchip_hibernate.dao.ReizigerDAOHibernate;
+import ovchip_hibernate.dao.*;
+import ovchip_hibernate.domein.Adres;
 import ovchip_hibernate.domein.OVChipKaart;
 import ovchip_hibernate.domein.Product;
 import ovchip_hibernate.domein.Reiziger;
@@ -16,7 +14,6 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,11 +34,14 @@ public class Main {
 
     public static void main(String[] args) throws SQLException {
         testFetchAll();
-        testDAO2Hiberate();
-        testDAOHibernate();
+        testProductDAOHibernate();
+        testReizigerDAOHibernate();
+        testOVCDAOHibernate();
+        testAdresDAOHibernate();
+        System.out.println("Lazy testing ik weet het :)");
     }
 
-    private static void testDAO2Hiberate() throws SQLException {
+    private static void testProductDAOHibernate()  {
         /*Open factory*/
         SessionFactory factory = HibernateService.getFactory();
         Session session = HibernateService.getCurrentSession();
@@ -76,7 +76,61 @@ public class Main {
 
     }
 
-    private static void testDAOHibernate() {
+    private static void testOVCDAOHibernate(){
+        /*Open factory*/
+        SessionFactory factory = HibernateService.getFactory();
+        Session session = HibernateService.getCurrentSession();
+        Metamodel metamodel = session.getSessionFactory().getMetamodel();
+        OVChipkaartDAOHibernate DAO = new OVChipkaartDAOHibernate();
+
+        /*Zoeken op nummer*/
+        OVChipKaart ovc = DAO.findByNummer(35283);
+        System.out.println("[Test] Zoek OVChipkaart op nummer: " + ovc.toString());
+
+        /*OVC lijst*/
+        System.out.println("[Test] Alle objecten van type OVChipkaart uit database:");
+        List<OVChipKaart> ovcs = DAO.findAll();
+        for (OVChipKaart ov : ovcs){
+            System.out.println(ov);
+        }
+
+        /*OVC lijst*/
+        Reiziger reiz = new Reiziger(3, "H", "", "Lubben", Date.valueOf("1998-08-11"));
+        System.out.println("[Test] Alle objecten van type OVChipkaart uit database voor reiziger " + reiz.toString() + " :");
+        ovcs = DAO.findByReiziger(reiz);
+        for (OVChipKaart ov : ovcs){
+            System.out.println(ov);
+        }
+
+    }
+
+    private static void testAdresDAOHibernate(){
+        /*Open factory*/
+        SessionFactory factory = HibernateService.getFactory();
+        Session session = HibernateService.getCurrentSession();
+        Metamodel metamodel = session.getSessionFactory().getMetamodel();
+        AdresDAOHibernate DAO = new AdresDAOHibernate();
+
+        /*Lijst*/
+        System.out.println("[Test] Alle objecten van type Adres uit database:");
+        List<Adres> adressen = DAO.findAll();
+        for (Adres adres : adressen){
+            System.out.println(adres);
+        }
+
+        /*Adres by id*/
+        System.out.println("[Test] zoek adres op ID (5):");
+        Adres adres = DAO.findById(5);
+        System.out.println(adres.toString());
+
+        /*Zoek op reiziger*/
+        Reiziger reiz = new Reiziger(3, "H", "", "Lubben", Date.valueOf("1998-08-11"));
+        System.out.println("[Test] zoek adres op reiziger:" + reiz.toString());
+        adres = DAO.findByReiziger(reiz);
+        System.out.println(adres);
+    }
+
+    private static void testReizigerDAOHibernate() {
 
         try{
             /*Open factory*/
