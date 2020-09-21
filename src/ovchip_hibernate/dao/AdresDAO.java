@@ -1,17 +1,12 @@
 package ovchip_hibernate.dao;
 
-import ovchip_dao.domein.Adres;
-import ovchip_dao.domein.Reiziger;
+import ovchip_hibernate.domein.Adres;
+import ovchip_hibernate.domein.Reiziger;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
-public interface AdresDAO {
-    public boolean save(Adres adres) throws Exception;
-    public boolean update(Adres adres) throws SQLException;
-    public boolean delete(Adres adres) throws SQLException;
-
-    Adres findById(int id, boolean link) throws SQLException;
-    Adres findByReiziger(Reiziger reiziger, boolean link) throws SQLException;
-    ArrayList<Adres> findAll(boolean link) throws SQLException;
+public interface AdresDAO extends DefaultDAO{
+    Adres findById(int id);
+    Adres findByReiziger(Reiziger reiziger);
+    List<Adres> findAll();
 }

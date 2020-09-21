@@ -1,7 +1,5 @@
 package ovchip_hibernate.domein;
 
-import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
-
 import javax.persistence.*;
 
 @Entity
