@@ -111,7 +111,6 @@ public class ReizigerDAOPsql implements ReizigerDAO {
                     rs.getDate("geboortedatum")
             );
 
-
             //Links the reiziger and adres
             //Get adres and link both ways
             //Get OVKaarten and link both ways

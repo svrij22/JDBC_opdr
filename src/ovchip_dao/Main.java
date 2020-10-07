@@ -146,7 +146,7 @@ class Main {
     }
 
     private static void testAdresDAO(AdresDAO adao) throws Exception {
-        System.out.println("\n---------- Test ReizigerDAO -------------");
+        System.out.println("\n---------- Test AdresDAO -------------");
 
         // Haal alle reizigers op uit de database
         List<Adres> adressen = adao.findAll(true);

@@ -32,30 +32,18 @@
 -- DROP VIEW IF EXISTS s4_1; CREATE OR REPLACE VIEW s4_1 AS                                                     -- [TEST]
 
 select *
-from medewerkers where (gbdatum < '1980-01-01' OR functie IN ('TRAINER','VERKOPER'));
+from medewerkers where (gbdatum < '1980-01-01' AND functie IN ('TRAINER','VERKOPER'));
 
 -- S4.2.
 -- Geef de naam van de medewerkers met een voorvoegsel.
 -- DROP VIEW IF EXISTS s4_2; CREATE OR REPLACE VIEW s4_2 AS                                                     -- [TEST]
 
 select * from medewerkers where naam like '% %';
-select * from medewerkers where split_part(naam, ' ', 2) != '' ;
-
 
 -- S4.3. 
 -- Geef nu code, begindatum en aantal inschrijvingen (`aantal_inschrijvingen`) van alle
 -- cursusuitvoeringen in 2019 met minstens drie inschrijvingen.
 -- DROP VIEW IF EXISTS s4_3; CREATE OR REPLACE VIEW s4_3 AS                                                     -- [TEST]
-
--- draft
-select
-       i.cursus, i.begindatum, count(*) as a_ins,
-       count(i.cursus) >= 3 as inschrijvingen,
-       count(*) filter ( where count(i.cursus) >= 3 ) as test_filter
-from uitvoeringen u
-join inschrijvingen i on u.cursus = i.cursus and u.begindatum = i.begindatum
-GROUP BY i.cursus, i.begindatum
-HAVING count(i.cursus) >= 3;
 
 -- final
 select cursus, begindatum, count(*) as aantal_inschrijvingen
@@ -93,10 +81,13 @@ order by count(*) desc;
 -- jongste medewerker (`verschil`) en bepaal de gemiddelde leeftijd van
 -- de medewerkers (`gemiddeld`).
 -- Je mag hierbij aannemen dat elk jaar 365 dagen heeft.
--- DROP VIEW IF EXISTS s4_6; CREATE OR REPLACE VIEW s4_6 AS                                                     -- [TEST]
-select concat((max(gbdatum)-min(gbdatum))/365, ' jaar') as grootste_verschil,
-       to_timestamp(avg(extract(epoch from gbdatum)))::date AS gemiddeld
-       from medewerkers;
+-- DROP VIEW IF EXISTS s4_6; CREATE OR REPLACE VIEW s4_6 AS                                           -- [TEST]
+
+/*Dit leek me nog steeds de mooiste oplossing*/
+
+select (max(age(gbdatum))-min(age(gbdatum))) as grootste_verschil,
+       avg(age(gbdatum)) AS gemiddeld
+from medewerkers;
 
 -- S4.7. 
 -- Geef van het hele bedrijf een overzicht van het aantal medewerkers dat
@@ -106,9 +97,9 @@ select concat((max(gbdatum)-min(gbdatum))/365, ' jaar') as grootste_verschil,
 -- DROP VIEW IF EXISTS s4_7; CREATE OR REPLACE VIEW s4_7 AS                                                     -- [TEST]
 
 select count(*) as aantal_medewerkers,
-       round(sum(comm)/count(*), 2) as commissie_medewerkers,
-       round(avg(comm) filter ( where functie='VERKOPER' ),2)
-       from medewerkers;
+       avg(coalesce(comm, 0)) as commisie_medewerkers,
+       avg(comm)
+from medewerkers;
 
 -- -------------------------[ HU TESTRAAMWERK ]--------------------------------
 -- Met onderstaande query kun je je code testen. Zie bovenaan dit bestand

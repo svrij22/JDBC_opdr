@@ -1,12 +1,14 @@
 package ovchip_hibernate.domein;
 
+import net.bytebuddy.implementation.bind.annotation.IgnoreForBinding;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "adres", schema = "public", catalog = "ovchip")
 public class Adres {
 
-    @Id
+    @Id @GeneratedValue
     private int adres_id;
     private int reiziger_id;
     private String postcode;

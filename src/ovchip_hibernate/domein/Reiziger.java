@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Reiziger implements Serializable {
 
     @Id
-    private int reiziger_id;
+    @GeneratedValue private int reiziger_id;
     private String voorletters, tussenvoegsel, achternaam;
     private Date geboortedatum;
 

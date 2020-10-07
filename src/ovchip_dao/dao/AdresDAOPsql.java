@@ -32,7 +32,7 @@ public class AdresDAOPsql implements AdresDAO{
         stmt.setString(3, adres.getHuisnummer());
         stmt.setString(4, adres.getStraat());
         stmt.setString(5, adres.getWoonplaats());
-        stmt.setInt(6, adres.getReiziger_id());
+        stmt.setInt(6, adres.getReiziger().getReiziger_id());
 
         //Return result
         return stmt.execute();
@@ -48,7 +48,7 @@ public class AdresDAOPsql implements AdresDAO{
         stmt.setString(2, adres.getHuisnummer());
         stmt.setString(3, adres.getStraat());
         stmt.setString(4, adres.getWoonplaats());
-        stmt.setInt(5, adres.getReiziger_id());
+        stmt.setInt(5, adres.getReiziger().getReiziger_id());
         stmt.setInt(6, adres.getAdres_id());
 
         //Execute and return value
@@ -117,7 +117,6 @@ public class AdresDAOPsql implements AdresDAO{
             //Link the values to a new object
             Adres adres = new Adres(
                     rs.getInt("adres_id"),
-                    rs.getInt("reiziger_id"),
                     rs.getString("postcode"),
                     rs.getString("huisnummer"),
                     rs.getString("straat"),
@@ -126,12 +125,11 @@ public class AdresDAOPsql implements AdresDAO{
 
             if (link){
                 //Links adres and reiziger both ways
-                Reiziger reiz = ReizigerDAOPsql.DAO.findById(adres.getReiziger_id(), false);
+                int reiziger_id = Integer.parseInt(rs.getString("reiziger_id"));
+                Reiziger reiz = ReizigerDAOPsql.DAO.findById(reiziger_id, true);
+
                 reiz.setAdres(adres);
                 adres.setReiziger(reiz);
-
-                //Get OVKaarten and link both ways
-                OVChipkaartDAOPsql.DAO.findByReiziger(reiz, true);
             }
 
             //Add to list

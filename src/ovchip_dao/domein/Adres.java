@@ -1,13 +1,12 @@
 package ovchip_dao.domein;
 
 public class Adres {
-    private int adres_id, reiziger_id;
+    private int adres_id;
     private String postcode, huisnummer, straat, woonplaats;
     private Reiziger reiziger;
 
-    public Adres(int adres_id, int reiziger_id, String postcode, String huisnummer, String straat, String woonplaats) {
+    public Adres(int adres_id, String postcode, String huisnummer, String straat, String woonplaats) {
         this.adres_id = adres_id;
-        this.reiziger_id = reiziger_id;
         this.postcode = postcode;
         this.huisnummer = huisnummer;
         this.straat = straat;
@@ -28,14 +27,6 @@ public class Adres {
 
     public void setAdres_id(int adres_id) {
         this.adres_id = adres_id;
-    }
-
-    public int getReiziger_id() {
-        return reiziger_id;
-    }
-
-    public void setReiziger_id(int reiziger_id) {
-        this.reiziger_id = reiziger_id;
     }
 
     public String getPostcode() {

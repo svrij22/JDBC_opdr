@@ -9,7 +9,7 @@ import java.util.Objects;
 @Table(name = "product", schema = "public", catalog = "ovchip")
 public class Product {
 
-    @Id private int product_nummer;
+    @Id @GeneratedValue private int product_nummer;
     private String naam;
     private String beschrijving;
     private double prijs;
