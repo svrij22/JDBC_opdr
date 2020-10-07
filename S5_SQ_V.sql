@@ -33,7 +33,7 @@
 
 select cursist
 from inschrijvingen
-where cursus='S02'
+where cursus='XML'
 and cursist in (SELECT cursist FROM inschrijvingen WHERE cursus='JAV');
 
 -- S5.2.
@@ -66,8 +66,8 @@ and mnr in (select chef from medewerkers group by chef having count (*) > 1);
 -- ('BLD') in 2020.
 -- DROP VIEW IF EXISTS s5_5; CREATE OR REPLACE VIEW s5_5 AS                                                     -- [TEST]
 
-
--- BLD bestaat niet
+select * from uitvoeringen
+where cursus in (select code from cursussen where type = 'BLD');
 
 -- S5.6.
 -- Geef van alle cursusuitvoeringen: de cursuscode, de begindatum en het
@@ -95,13 +95,13 @@ from uitvoeringen u;
 select concat(voorl, ' ', naam)
 from medewerkers m
 where functie = 'TRAINER'
-and chef in (
-    select docent
-    from uitvoeringen u
+  and chef in (
+    select cursist
+    from inschrijvingen i
     where begindatum in (
         select begindatum
-        from inschrijvingen i
-        where m.mnr = i.cursist));
+        from uitvoeringen u
+        where m.mnr = u.docent));
 
 -- S5.8.
 -- Geef de naam van de medewerkers die nog nooit een cursus hebben gegeven.

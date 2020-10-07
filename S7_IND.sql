@@ -117,7 +117,9 @@ and order_id in
 -- 2. Kijk of je met 1 of meer indexen de query zou kunnen versnellen
 -- 3. Maak de index(en) aan en run nogmaals het EXPLAIN plan (kopieer weer onder de opdracht)
 -- 4. Wat voor verschillen zie je? Verklaar hieronder.
+
 explain select order_id, order_date, salesperson_person_id from orders
+
 where salesperson_person_id in
       (select salesperson_person_id
        from orders
@@ -129,8 +131,50 @@ where salesperson_person_id in
 
 CREATE INDEX sales_p_id_idx ON orders (salesperson_person_id);
 CREATE INDEX orders_cust_id_idx ON orders (customer_id);
+CREATE INDEX orderl_cust_id_idx ON order_lines (order_id);
+
+/*
+VOOR
+
+Hash Join  (cost=8353.03..10200.96 rows=303 width=12)
+  Hash Cond: (orders.salesperson_person_id = orders_1.salesperson_person_id)
+  ->  Hash Semi Join  (cost=6164.90..8009.06 rows=1010 width=12)
+        Hash Cond: (orders.order_id = order_lines.order_id)
+        ->  Seq Scan on orders  (cost=0.00..1635.95 rows=73595 width=12)
+        ->  Hash  (cost=6152.27..6152.27 rows=1010 width=4)
+              ->  Gather  (cost=1000.00..6152.27 rows=1010 width=4)
+                    Workers Planned: 2
+                    ->  Parallel Seq Scan on order_lines  (cost=0.00..5051.27 rows=421 width=4)
+                          Filter: (quantity > 250)
+  ->  Hash  (cost=2188.09..2188.09 rows=3 width=4)
+        ->  HashAggregate  (cost=2187.91..2188.06 rows=3 width=4)
+              Group Key: orders_1.salesperson_person_id
+              Filter: (avg((orders_1.expected_delivery_date - orders_1.order_date)) > 1.45)
+              ->  Seq Scan on orders orders_1  (cost=0.00..1635.95 rows=73595 width=12)
+
+NA
+
+  Hash Join  (cost=8353.03..10200.96 rows=303 width=12)
+  Hash Cond: (orders.salesperson_person_id = orders_1.salesperson_person_id)
+  ->  Hash Semi Join  (cost=6164.90..8009.06 rows=1010 width=12)
+        Hash Cond: (orders.order_id = order_lines.order_id)
+        ->  Seq Scan on orders  (cost=0.00..1635.95 rows=73595 width=12)
+        ->  Hash  (cost=6152.27..6152.27 rows=1010 width=4)
+              ->  Gather  (cost=1000.00..6152.27 rows=1010 width=4)
+                    Workers Planned: 2
+                    ->  Parallel Seq Scan on order_lines  (cost=0.00..5051.27 rows=421 width=4)
+                          Filter: (quantity > 250)
+  ->  Hash  (cost=2188.09..2188.09 rows=3 width=4)
+        ->  HashAggregate  (cost=2187.91..2188.06 rows=3 width=4)
+              Group Key: orders_1.salesperson_person_id
+              Filter: (avg((orders_1.expected_delivery_date - orders_1.order_date)) > 1.45)
+              ->  Seq Scan on orders orders_1  (cost=0.00..1635.95 rows=73595 width=12)
+*/
+
+
+/*4. Ik zie werkelijk geen verschil*/
 
 -- S7.3.C
 --
 -- Zou je de query ook heel anders kunnen schrijven om hem te versnellen?
-
+-- Je zou hem eventueel met joins kunnen schrijven

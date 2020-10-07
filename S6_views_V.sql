@@ -18,6 +18,9 @@
 --       FROM medewerkers;
 -- 3. Is de view "deelnemers" updatable ? Waarom ?
 
+/*All views are not updatable. So, UPDATE command is not applicable to all views. If you update a view, you're actually updating its underlying table*/
+/*Het is niet mogelijk een view te updaten omdat het geen tabel is*/
+
 CREATE OR REPLACE VIEW deelnemers AS
 SELECT i.cursist, i.cursus, i.begindatum, u.docent, u.locatie
 FROM inschrijvingen i
@@ -55,5 +58,7 @@ select * from daguitvoeringen;
 -- 3. Verwijder de views en laat zien wat de verschillen zijn bij DROP view <viewnaam> CASCADE en bij DROP view <viewnaam> RESTRICT
 
 DROP view dagcursussen CASCADE;
+DROP view dagcursussen RESTRICT;
 
--- CASCADE dropt ook daguitvoeringen omdat die leunt op de dagcursussen view
+-- CASCADE dropt ook daguitvoeringen omdat die leunt op de dagcursussen view.
+-- RESTRICT weigert de view te droppen als er andere views afhankelijk van zijn.
